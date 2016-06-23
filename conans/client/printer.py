@@ -38,7 +38,7 @@ class Printer(object):
             self._out.writeln("    %s" % repr(ref), Color.BRIGHT_CYAN)
         self._out.writeln("")
 
-    def print_info(self, deps_graph, project_reference, _info, registry, graph_updates_info=None, remote=None):
+    def print_info(self, deps_graph, project_reference, _info, registry, graph_updates_info=None, remote=None, machine=False):
         """ Print the dependency information for a conan file
 
             Attributes:
@@ -55,6 +55,22 @@ class Printer(object):
             if field in [s.lower() for s in _info.split(",")]:
                 return True
             return False
+
+        if machine:
+            for level in deps_graph.propagate_info():
+                for node in level:
+                    conanref, conanfile = node
+                    if not conanref: continue
+                    update = graph_updates_info.get(conanref)
+                    updatetext = ""
+                    if update == 1: updatetext = "R"
+                    elif update == -1: updatetext = "L"
+                    elif update == 0: updatetext = "E"
+                    else: updatetext = "?"
+
+                    self._out.writeln("%s:%s" % (conanref, updatetext))
+
+            return
 
         graph_updates_info = graph_updates_info or {}
         for node in sorted(deps_graph.nodes):

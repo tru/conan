@@ -72,7 +72,18 @@ class ConanProxy(object):
         return False
 
     def get_conanfile(self, conan_reference):
+        class NullOutput:
+            def info(self, data):
+                pass
+            def warn(self, data):
+                pass
+            def error(self, data):
+                pass
+
+ #       if not self._machine:
         output = ScopedOutput(str(conan_reference), self._out)
+#        else:
+#            output = NullOutput()
 
         def _refresh():
             conan_dir_path = self._paths.export(conan_reference)
@@ -138,6 +149,8 @@ class ConanProxy(object):
             upstream_manifest = self.get_conan_digest(conan_reference)
             if upstream_manifest.file_sums != read_manifest.file_sums:
                 return 1 if upstream_manifest.time > read_manifest.time else -1
+        except NotFoundException:
+            return -1
         except ConanException:
             pass
 

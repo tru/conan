@@ -142,8 +142,8 @@ class ConanManager(object):
             remote_proxy.download_packages(reference, list(info[reference].keys()))
 
     def install(self, reference, current_path, remote=None, options=None, settings=None,
-                build_mode=False, info=None, filename=None, update=False, check_updates=False,
-                integrity=False, scopes=None):
+                build_mode=False, info=None, filename=None, update=False, check_updates=None,
+                integrity=False, scopes=None, machine=False):
         """ Fetch and build all dependencies for the given reference
         @param reference: ConanFileReference or path to user space conanfile
         @param current_path: where the output files will be saved
@@ -159,8 +159,9 @@ class ConanManager(object):
 
         loader = self._loader(current_path, settings, options, scopes)
         # Not check for updates for info command, it'll be checked when dep graph is built
+        cu = False if info else check_updates
         remote_proxy = ConanProxy(self._paths, self._user_io, self._remote_manager,
-                                  remote, update=update, check_updates=check_updates,
+                                  remote, update=update, check_updates=cu,
                                   check_integrity=integrity)
 
         if reference_given:
@@ -197,7 +198,7 @@ class ConanManager(object):
                 graph_updates_info = {}
             Printer(self._user_io.out).print_info(deps_graph, project_reference,
                                                   info, registry, graph_updates_info,
-                                                  remote)
+                                                  remote, machine)
             return
         Printer(self._user_io.out).print_graph(deps_graph, registry)
 

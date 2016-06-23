@@ -339,6 +339,8 @@ path to the CMake binary directory, like this:
                             help='Check that the stored recipe or package manifests are correct')
         parser.add_argument("--update", "-u", action='store_true', default=False,
                             help="check updates exist from upstream remotes")
+        parser.add_argument("--machine", "-m", action='store_true', default=False,
+                            help="output in machine friendly text")
 
         args = parser.parse_args(*args)
 
@@ -359,6 +361,7 @@ path to the CMake binary directory, like this:
                               info=args.only or True,
                               check_updates=args.update,
                               integrity=args.integrity,
+                              machine=args.machine,
                               filename=args.file)
 
     def build(self, *args):
